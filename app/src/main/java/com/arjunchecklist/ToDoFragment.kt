@@ -14,6 +14,25 @@ import android.view.View.OnTouchListener
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_to_do.*
 import androidx.lifecycle.ViewModelProvider
+import android.app.NotificationManager
+import android.content.Context.NOTIFICATION_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import android.app.NotificationChannel
+import android.content.Context.NOTIFICATION_SERVICE
+import android.graphics.Color
+import androidx.core.content.ContextCompat.getSystemService
+import android.content.Context.ALARM_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.SystemClock
+import android.content.Context.ALARM_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import android.content.Context.ALARM_SERVICE
+import android.util.Log
+import androidx.core.content.ContextCompat.getSystemService
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -48,7 +67,14 @@ class ToDoFragment : Fragment() {
     var mselectedDate = "";
     private lateinit var wordViewModel: ViewModel
 
-
+    // Notification ID.
+    private val NOTIFICATION_ID = 0
+    // Notification channel ID.
+    private val PRIMARY_CHANNEL_ID = "primary_notification_channel"
+    protected lateinit var mNotificationManager: NotificationManager;
+    var mYearParam = 0;
+    var mMonthParam = 0;
+    var mDayParam = 0;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -67,22 +93,22 @@ class ToDoFragment : Fragment() {
         wordViewModel = ViewModelProvider(this).get(ViewModel::class.java)
 
         retainInstance = true
+        mNotificationManager =
+            context?.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+
     }
 
-    fun newInstance(): ToDoFragment {
-        val data = Bundle()
-        val fooFragment = ToDoFragment()
-        fooFragment.setArguments(data);
-        return fooFragment
+
+    override fun onResume() {
+        super.onResume()
+        hideFab();
     }
 
-    fun newInstance(text: String): ToDoFragment {
-        val data = Bundle()
-        data.putString("title", text)
-        val fooFragment = ToDoFragment()
-        fooFragment.setArguments(data);
-        return fooFragment
+    fun hideFab() {
+        (activity as MainActivity).hideFab()
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -112,28 +138,46 @@ class ToDoFragment : Fragment() {
 
         val buttonText = view.button_done.text.toString();
 
-
         view.button_done.setOnClickListener {
 
-            if (buttonText.equals("Done")) {
-                var list = CheckList(
-                    view.editText_title.text.toString(),
-                    view.edit_datepicker.text.toString(),
-                    view.edit_text_timer.text.toString()
-                )//read only, fix-size
-                wordViewModel.insert(list)
-                activity?.onBackPressed();
-
+            if (view.editText_title.text.toString().equals("") && view.edit_datepicker.text.toString().equals(
+                    ""
+                ) && view.edit_text_timer.text.toString().equals("")
+            ) {
+                Toast.makeText(context, "Please enter all fields", Toast.LENGTH_SHORT).show()
             } else {
-                wordViewModel.updateAChecklist(
-                    param4!!,
-                    view.editText_title.text.toString(),
-                    view.edit_datepicker.text.toString(),
-                    view.edit_text_timer.text.toString()
-                )
-                activity?.onBackPressed();
+                if (buttonText.equals("Done")) {
+                    var list = CheckList(
+                        view.editText_title.text.toString(),
+                        view.edit_datepicker.text.toString(),
+                        view.edit_text_timer.text.toString()
+                    )//read only, fix-size
+                    wordViewModel.insert(list)
 
+                    val alarmMgr = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager?
+                    val intent = Intent(context, AlarmReceiver::class.java)
+                    val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0)
+                    val time = Calendar.getInstance()
+                    time.set(mYear, mMonth - 1, mDay, mHour, mMinute, 0);
+                    Log.d(
+                        "selected ",
+                        "Year:${mYear} Month:${mMonth} Day:${mDay} Hour :${mHour} Minute${mMinute}"
+                    );
 
+                    alarmMgr!!.set(AlarmManager.RTC_WAKEUP, time.timeInMillis, pendingIntent)
+                    activity?.onBackPressed();
+
+                } else {
+                    wordViewModel.updateAChecklist(
+                        param4!!,
+                        view.editText_title.text.toString(),
+                        view.edit_datepicker.text.toString(),
+                        view.edit_text_timer.text.toString()
+
+                    )
+                    activity?.onBackPressed();
+
+                }
             }
         }
         return view;
@@ -180,7 +224,7 @@ class ToDoFragment : Fragment() {
     companion object {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String, param3: String,param4:Int) =
+        fun newInstance(param1: String, param2: String, param3: String, param4: Int) =
             ToDoFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)

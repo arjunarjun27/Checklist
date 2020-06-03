@@ -20,6 +20,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
  * A simple [Fragment] subclass.
  */
 class MainFragment : Fragment(), CheckListAdapter.OnItemClickListener {
+
+
+
     override fun onEditItemclicked(checklist: CheckList) {
         val todoFragment = ToDoFragment.newInstance(checklist.title,checklist.date,checklist.time, checklist.id
         )
