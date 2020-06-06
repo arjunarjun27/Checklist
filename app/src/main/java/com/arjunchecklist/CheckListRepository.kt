@@ -18,4 +18,8 @@ class CheckListRepository(private val checkListDao: CheckListDao){
     suspend fun update(id:Int,title:String,date:String,time:String) {
         checkListDao.update(id,title,date,time)
     }
+
+    suspend fun getCount(){
+        checkListDao.getCount();
+    }
  }

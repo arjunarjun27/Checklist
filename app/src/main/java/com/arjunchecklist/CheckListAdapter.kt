@@ -50,9 +50,6 @@ class CheckListAdapter internal constructor(
 
     override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
         val current = words[position]
-//        holder.wordItemView.text = current.title
-//        holder.worddate.text = current.date
-//        holder.wordtime.text = current.time
         holder.bind(current, onItemClickListener);
 
     }

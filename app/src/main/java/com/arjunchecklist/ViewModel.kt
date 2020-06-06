@@ -34,4 +34,8 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         repository.update(id,title,date,time)
     }
 
+    fun  getRowCount() = viewModelScope.launch(Dispatchers.IO){
+        repository.getCount();
+    }
+
 }

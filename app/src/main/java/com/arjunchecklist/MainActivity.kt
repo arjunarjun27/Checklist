@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
         transaction.replace(R.id.fragment_container, mainFragment)
         transaction.commit()
 
-
         fab.setOnClickListener { view ->
             val todoFragment = ToDoFragment()
             val manager = supportFragmentManager

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 class MainFragment : Fragment(), CheckListAdapter.OnItemClickListener {
 
 
+    private lateinit var wordViewModel: ViewModel
 
     override fun onEditItemclicked(checklist: CheckList) {
         val todoFragment = ToDoFragment.newInstance(checklist.title,checklist.date,checklist.time, checklist.id
@@ -39,14 +40,9 @@ class MainFragment : Fragment(), CheckListAdapter.OnItemClickListener {
         retainInstance=true
     }
     override fun onDeleteItemclicked(checklist: CheckList) {
-
-        Toast.makeText(activity, "Title ${checklist.title} ", Toast.LENGTH_LONG)
-            .show()
-
         wordViewModel.deleteATitle(checklist.id);
     }
 
-    private lateinit var wordViewModel: ViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,14 +55,16 @@ class MainFragment : Fragment(), CheckListAdapter.OnItemClickListener {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val itemDecoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        recyclerView.addItemDecoration(itemDecoration)
-
         wordViewModel = ViewModelProvider(this).get(ViewModel::class.java)
         wordViewModel.allWords.observe(viewLifecycleOwner, Observer { words ->
             // Update the cached copy of the words in the adapter.
-            words?.let { adapter.setWords(it) }
+            words?.let { adapter.setWords(it)
+
+            }
+
         })
+
+
 
         return view;
     }

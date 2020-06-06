@@ -9,4 +9,7 @@
     <string name="title">Title</string>
 
     <string name="text">Text</string>
+    <string name="update">Update</string>
+    <string name="enter_all_fields">Please enter all fields</string>
+    <string name="done">Done</string>
 </resources>

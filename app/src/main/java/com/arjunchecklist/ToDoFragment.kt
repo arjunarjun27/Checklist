@@ -42,14 +42,7 @@ private const val ARG_PARAM2 = "param2"
 private const val ARG_PARAM3 = "param3"
 private const val ARG_PARAM4 = "param4"
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [ToDoFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [ToDoFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class ToDoFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -57,24 +50,18 @@ class ToDoFragment : Fragment() {
     private var param3: String? = null
     private var param4: Int? = null
 
-    //private var listener: OnFragmentInteractionListener? = null
     private var mYear: Int = 0
     private var mMonth: Int = 0
     private var mDay: Int = 0
     private var mHour: Int = 0
     private var mMinute: Int = 0
     private var c: Calendar? = null
-    var mselectedDate = "";
     private lateinit var wordViewModel: ViewModel
 
-    // Notification ID.
     private val NOTIFICATION_ID = 0
-    // Notification channel ID.
     private val PRIMARY_CHANNEL_ID = "primary_notification_channel"
     protected lateinit var mNotificationManager: NotificationManager;
-    var mYearParam = 0;
-    var mMonthParam = 0;
-    var mDayParam = 0;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -119,7 +106,7 @@ class ToDoFragment : Fragment() {
         view.edit_datepicker.setText(param2)
         view.edit_text_timer.setText(param3)
         if (param1 != null)
-            view.button_done.setText("Update")
+            view.button_done.setText(getString(R.string.update))
 
 
         view.edit_datepicker.setOnTouchListener(OnTouchListener { v, event ->
@@ -144,27 +131,15 @@ class ToDoFragment : Fragment() {
                     ""
                 ) && view.edit_text_timer.text.toString().equals("")
             ) {
-                Toast.makeText(context, "Please enter all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.enter_all_fields), Toast.LENGTH_SHORT).show()
             } else {
-                if (buttonText.equals("Done")) {
+                if (buttonText.equals(getString(R.string.done))) {
                     var list = CheckList(
                         view.editText_title.text.toString(),
                         view.edit_datepicker.text.toString(),
                         view.edit_text_timer.text.toString()
                     )//read only, fix-size
                     wordViewModel.insert(list)
-
-                    val alarmMgr = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager?
-                    val intent = Intent(context, AlarmReceiver::class.java)
-                    val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0)
-                    val time = Calendar.getInstance()
-                    time.set(mYear, mMonth - 1, mDay, mHour, mMinute, 0);
-                    Log.d(
-                        "selected ",
-                        "Year:${mYear} Month:${mMonth} Day:${mDay} Hour :${mHour} Minute${mMinute}"
-                    );
-
-                    alarmMgr!!.set(AlarmManager.RTC_WAKEUP, time.timeInMillis, pendingIntent)
                     activity?.onBackPressed();
 
                 } else {
@@ -196,7 +171,7 @@ class ToDoFragment : Fragment() {
                 mMonth = monthOfYear + 1
                 mYear = year
                 mDay = dayOfMonth
-                edit_datepicker.setText(mDay.toString() + '-' + mMonth.toString() + '-' + mYear.toString())
+                edit_datepicker.setText("${mDay.toString()}-${mMonth.toString()}- ${mYear.toString()}")
 
             }, mYearParam, mMonthParam, mDayParam
         )
@@ -213,7 +188,7 @@ class ToDoFragment : Fragment() {
             TimePickerDialog.OnTimeSetListener { view, pHour, pMinute ->
                 mHour = pHour
                 mMinute = pMinute
-                edit_text_timer.setText(mHour.toString() + '-' + mMinute.toString());
+                edit_text_timer.setText("${mHour.toString()} : ${mMinute.toString()}");
             }, mHour, mMinute, true
         )
 
